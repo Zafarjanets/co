@@ -26,6 +26,7 @@ var _star_cooldown := 0.0
 var _spawn_timer := 0.0
 var _see_timer := 0.0
 var _seen := false
+var min_spawn_dist := INF          # closest spawn so far (diagnostics/tests)
 var _rng := RandomNumberGenerator.new()
 var _ray := PhysicsRayQueryParameters3D.new()
 
@@ -344,6 +345,7 @@ func _spawn_needed(focus: Vector3) -> void:
 		if not clear:
 			continue
 		var dir: Vector3 = (pts[1] - pts[0]).normalized()
+		min_spawn_dist = minf(min_spawn_dist, dist)
 		var car := main.spawn_car("posbon", Transform3D(Basis(Vector3.UP, atan2(-dir.x, -dir.z)), p + Vector3(0, 0.5, 0)), {})
 		var drv := AiDriver.new(car, layout)
 		drv.cruise = 12.0

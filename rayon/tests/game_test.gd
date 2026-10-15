@@ -174,11 +174,7 @@ func _run() -> void:
 	await wait(3.0)
 	var cops := main.police.cops.size()
 	check(cops >= 2, "police cars dispatched (%d)" % cops)
-	var visible_spawn := false
-	for d in main.police.cops:
-		if d.car.global_position.distance_to(main.focus_position()) < 60.0:
-			visible_spawn = true
-	check(not visible_spawn, "patrols do not spawn right next to the player")
+	check(main.police.min_spawn_dist >= 90.0, "patrols spawn away from the player (closest %.0f m, out of view)" % main.police.min_spawn_dist)
 	await shot("05_chase")
 	# Hide under the covered parking far from the cops.
 	var hide: AABB = main.city.hide_zones[0]
@@ -207,14 +203,15 @@ func _run() -> void:
 	var cop := main.spawn_car("posbon", cop_xf, {})
 	var drv := AiDriver.new(cop, main.layout)
 	main.police.cops.append(drv)
-	var busted := false
-	main.police.busted.connect(func(_f): busted = true, CONNECT_ONE_SHOT)
+	var busted := [false]
+	main.police.busted.connect(func(_f): busted[0] = true, CONNECT_ONE_SHOT)
 	for i in 30:
-		cop.place(cop_xf)
+		if not busted[0] and is_instance_valid(cop):
+			cop.place(cop_xf)
 		await wait(0.25)
-		if busted:
+		if busted[0]:
 			break
-	check(busted, "standing still next to the police ends in arrest")
+	check(busted[0], "standing still next to the police ends in arrest")
 	check(Game.money() < money_before, "arrest takes a fine ($%d → $%d)" % [money_before, Game.money()])
 	check(main.player.global_position.distance_to(CityLayout.GARAGE_APRON) < 10.0, "after arrest the hero is back at the garage")
 	main.menus._close_all()

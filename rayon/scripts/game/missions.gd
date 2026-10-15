@@ -12,7 +12,7 @@ signal finished(id: String, success: bool, text: String)
 const START_RADIUS := 6.0
 const DEFS := {
 	"delivery": {"title": "Доставка", "reward": 600, "color": Color("ffb43c"),
-		"start": Vector3(-112.0, CityLayout.CURB_H, 16.0)},
+		"start": Vector3(-118.0, CityLayout.CURB_H, 18.0)},
 	"ring": {"title": "Кольцо", "reward": 800, "color": Color("3cc8ff"),
 		"start": Vector3(-260.0, 0.0, 70.0)},
 	"escape": {"title": "Оторвись", "reward": 1000, "color": Color("ff4b5c"),

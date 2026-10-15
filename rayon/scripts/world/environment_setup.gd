@@ -26,7 +26,7 @@ static func create(parent: Node) -> DirectionalLight3D:
 	env.tonemap_white = 1.4
 	env.fog_enabled = true
 	env.fog_light_color = Color("b9d8ee")
-	env.fog_density = 0.00032
+	env.fog_density = 0.00016
 	env.fog_sky_affect = 0.0
 	env.fog_aerial_perspective = 0.0
 	env.adjustment_enabled = true

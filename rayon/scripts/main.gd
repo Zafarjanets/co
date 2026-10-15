@@ -49,6 +49,8 @@ func _ready() -> void:
 	rig = CameraRig.new()
 	world.add_child(rig)
 	rig.follow(player, false)
+	rig.process_mode = Node.PROCESS_MODE_ALWAYS
+	rig.menu_mode = true
 
 	_spawn_my_car()
 	_spawn_parked_cars()
@@ -479,6 +481,8 @@ func apply_settings() -> void:
 
 func start_game() -> void:
 	playing = true
+	rig.menu_mode = false
+	rig.follow(player, false)
 	get_tree().paused = false
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	Sfx.start()

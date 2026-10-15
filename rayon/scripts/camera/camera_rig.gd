@@ -15,6 +15,8 @@ var invert_y := false
 var _look_timer := 0.0
 var _shake := 0.0
 var _dist := 4.5
+var menu_mode := false       # slow cinematic orbit behind the start menu
+var _menu_t := 0.0
 
 
 func _ready() -> void:
@@ -66,6 +68,14 @@ func _focus() -> Vector3:
 
 
 func _process(delta: float) -> void:
+	if menu_mode:
+		_menu_t += delta
+		var centre := CityLayout.GARAGE_APRON + Vector3(10, 0, -14)
+		global_position = centre + Vector3(0, 6, 0)
+		arm.spring_length = 26.0
+		arm.rotation = Vector3(-0.28, PI * 0.75 + _menu_t * 0.04, 0)
+		camera.fov = 60.0
+		return
 	if target_node == null or not is_instance_valid(target_node):
 		return
 	var focus := _focus()

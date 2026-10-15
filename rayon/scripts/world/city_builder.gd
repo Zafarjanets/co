@@ -6,11 +6,11 @@ extends Node3D
 
 
 
-const WALL_COLORS := [Color("f1e6cc"), Color("ead9bd"), Color("efd6c8"), Color("f4f2ec"),
-	Color("f3e3a8"), Color("f2cfae"), Color("d9e4ea"), Color("e6efe0")]
+const WALL_COLORS := [Color("e6cc98"), Color("d8bd96"), Color("dfb4a2"), Color("ebe7dd"),
+	Color("e8c97a"), Color("e2ae86"), Color("b7cbd8"), Color("c4d8bb")]
 const ASPHALT := Color("50545b")
-const PAVING := Color("d3ccbf")
-const CURB := Color("b9b3a8")
+const PAVING := Color("aea698")
+const CURB := Color("8f8a80")
 const GRASS := Color("7fb85a")
 const GRASS_DARK := Color("6aa64c")
 
@@ -283,6 +283,9 @@ func _courtyard(c: Rect2) -> void:
 		return
 	var y := CityLayout.CURB_H
 	var centre := Vector3(c.get_center().x, y, c.get_center().y)
+	# The yard itself is mostly grass with a paved strip through the middle.
+	_slabs.ground_rect("detail", centre + Vector3(0, 0.006, 0), c.size.x + 6.0, c.size.y + 6.0, GRASS_DARK)
+	_slabs.ground_rect("detail", centre + Vector3(0, 0.009, 0), c.size.x + 6.0, 7.0, PAVING)
 	# Lawn patches with trees and bushes.
 	for i in 2:
 		var lx := c.position.x + c.size.x * (0.25 + 0.5 * i)
@@ -546,7 +549,7 @@ func _edge_and_horizon() -> void:
 		var base := Vector3(cos(a) * dist, 0, sin(a) * dist)
 		var h := mrng.randf_range(260, 520) * (1.25 if sin(a) < -0.3 else 1.0)
 		var rad := mrng.randf_range(380, 560)
-		var col: Color = [Color("8f7d86"), Color("9a8576"), Color("85778f")][i % 3]
+		var col: Color = [Color("6c5868"), Color("7a6352"), Color("625775")][i % 3]
 		_mountain(k, base, rad, h, col, mrng)
 	# Landmarks in the distance (tower on the hills to the north).
 	var tower := Models.instance("buildings/tv_tower")

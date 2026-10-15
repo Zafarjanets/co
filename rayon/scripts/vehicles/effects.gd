@@ -66,14 +66,14 @@ func _smoke_for(c: Car) -> CPUParticles3D:
 	p.gravity = Vector3(0, 0.6, 0)
 	p.initial_velocity_min = 0.6
 	p.initial_velocity_max = 1.8
-	p.scale_amount_min = 0.6
-	p.scale_amount_max = 1.4
+	p.scale_amount_min = 0.4
+	p.scale_amount_max = 0.9
 	var curve := Curve.new()
 	curve.add_point(Vector2(0, 0.4))
 	curve.add_point(Vector2(1, 2.4))
 	p.scale_amount_curve = curve
 	var grad := Gradient.new()
-	grad.set_color(0, Color(0.92, 0.92, 0.92, 0.55))
+	grad.set_color(0, Color(0.92, 0.92, 0.92, 0.35))
 	grad.set_color(1, Color(0.95, 0.95, 0.95, 0.0))
 	p.color_ramp = grad
 	var sphere := SphereMesh.new()
@@ -128,7 +128,7 @@ func _add_mark(a: Vector3, b: Vector3, alpha: float) -> void:
 	var d := b - a
 	var len := d.length()
 	var fwd := d / len
-	var right := fwd.cross(Vector3.UP).normalized()
+	var right := Vector3.UP.cross(fwd).normalized()
 	var basis := Basis(right * MARK_WIDTH, Vector3.UP, fwd * len)
 	_mm.set_instance_transform(_next, Transform3D(basis, (a + b) * 0.5))
 	_mm.set_instance_color(_next, Color(0.08, 0.08, 0.09, alpha))

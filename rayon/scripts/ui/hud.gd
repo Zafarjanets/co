@@ -256,6 +256,7 @@ func _on_wanted(stars: int, state: int) -> void:
 func _process(delta: float) -> void:
 	if main == null:
 		return
+	visible = main.playing
 	# Count money up/down smoothly.
 	var target := float(Game.money())
 	_shown_money = move_toward(_shown_money, target, maxf(absf(target - _shown_money) * delta * 4.0, 5.0))

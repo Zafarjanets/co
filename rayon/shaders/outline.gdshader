@@ -4,13 +4,14 @@ render_mode unshaded, cull_front, depth_draw_opaque, shadows_disabled, fog_disab
 
 uniform vec4 outline_color : source_color = vec4(0.09, 0.08, 0.1, 1.0);
 uniform float thickness = 0.025;
+global uniform float outline_scale;
 
 void vertex() {
 	vec3 sn = vec3(UV.x, UV.y, UV2.x);
 	if (length(sn) < 0.01) {
 		sn = NORMAL;
 	}
-	VERTEX += normalize(sn) * thickness;
+	VERTEX += normalize(sn) * thickness * outline_scale;
 }
 
 void fragment() {

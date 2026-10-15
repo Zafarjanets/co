@@ -51,11 +51,12 @@ static func detail() -> StandardMaterial3D:
 	return _cache["detail"]
 
 
-static func paint(color: Color, outline_thickness := 0.022) -> StandardMaterial3D:
+static func paint(color: Color, outline_thickness := 0.022, glossy := true) -> StandardMaterial3D:
 	var m := _base(outline_thickness)
 	m.albedo_color = color
-	m.specular_mode = BaseMaterial3D.SPECULAR_TOON
-	m.roughness = 0.45
+	if glossy:
+		m.specular_mode = BaseMaterial3D.SPECULAR_TOON
+		m.roughness = 0.45
 	return m
 
 

@@ -8,7 +8,7 @@ config_version=5
 config/name="РАЙОН / RAYON"
 config/description="Аркадная 3D-игра: открытый район, вождение, дрифт, задания и полиция."
 run/main_scene="res://scenes/main.tscn"
-config/features=PackedStringArray("4.3", "Forward Plus")
+config/features=PackedStringArray("4.3", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [autoload]
@@ -32,9 +32,19 @@ common/physics_jitter_fix=0.0
 
 [rendering]
 
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+
 rendering_device/fallback_to_opengl3=true
 anti_aliasing/quality/msaa_3d=1
 lights_and_shadows/directional_shadow/size=4096
 lights_and_shadows/directional_shadow/soft_shadow_filter_quality=2
 textures/default_filters/anisotropic_filtering_level=0
 environment/defaults/default_clear_color=Color(0.53, 0.78, 0.96, 1)
+
+[shader_globals]
+
+outline_scale={
+"type": "float",
+"value": 1.0
+}

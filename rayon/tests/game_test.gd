@@ -321,11 +321,10 @@ func _run() -> void:
 	check(Game.buy_car("m5") and Game.money() == before - 4000 and Game.owns("m5"), "garage sells the M5 for $4000")
 	Game.select_car("m5")
 	await wait(0.3)
-	check(main.my_car != null and main.my_car.kind == "m5" and main.my_car.model.has_meta("imported"), "bought M5 becomes the personal car")
-	check(main.my_car.model.get_node("Body").mesh.get_surface_count() < 20, "imported model merged into few draw calls")
+	check(main.my_car != null and main.my_car.kind == "m5" and main.my_car.model.has_meta("stylized"), "bought M5 becomes the personal car")
 	Game.set_car_value("m5", "paint", 2)
 	await wait(0.2)
-	check(main.my_car.paint == Game.PAINTS[2][1], "imported M5 can be repainted")
+	check(main.my_car.paint == Game.PAINTS[2][1], "M5 can be repainted")
 	Game.select_car("chabuk")
 	await wait(0.3)
 

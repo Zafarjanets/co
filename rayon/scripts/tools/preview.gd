@@ -26,6 +26,8 @@ func _initialize() -> void:
 	var sun := DirectionalLight3D.new()
 	sun.rotation_degrees = Vector3(-50, -35, 0)
 	sun.shadow_enabled = true
+	sun.shadow_bias = 0.06
+	sun.shadow_normal_bias = 1.6
 	world.add_child(sun)
 	var floor := MeshInstance3D.new()
 	var pm := PlaneMesh.new()
@@ -39,11 +41,7 @@ func _initialize() -> void:
 	var max_w := 0.0
 	var max_h := 0.0
 	for n in names:
-		var path := "res://models/%s.tscn" % n
-		if not ResourceLoader.exists(path):
-			push_error("missing " + path)
-			continue
-		var inst: Node3D = load(path).instantiate()
+		var inst: Node3D = Models.instance(n)
 		var aabb := _aabb(inst)
 		world.add_child(inst)
 		inst.position = Vector3(x - aabb.position.x, 0, 0)
@@ -55,7 +53,8 @@ func _initialize() -> void:
 	world.add_child(cam)
 	var centre := Vector3(max_w * 0.5 - 0.5, max_h * 0.4, 0)
 	var dist := maxf(max_w * 0.75, max_h * 1.6) + 2.0
-	cam.look_at_from_position(centre + Vector3(0, dist * 0.35, dist), centre)
+	var hk := float(OS.get_environment("PREVIEW_HEIGHT")) if OS.get_environment("PREVIEW_HEIGHT") != "" else 0.35
+	cam.look_at_from_position(centre + Vector3(0, dist * hk, dist), centre)
 	cam.fov = 45
 
 

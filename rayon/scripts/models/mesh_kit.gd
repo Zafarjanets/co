@@ -50,6 +50,25 @@ func tri(surface: String, a: Vector3, b: Vector3, c: Vector3, col: Color) -> voi
 		s["s"].append(n)
 
 
+## Triangle with explicit (smooth) vertex normals, counter-clockwise from the front.
+func tri_smooth(surface: String, a: Vector3, b: Vector3, c: Vector3, na: Vector3, nb: Vector3, nc: Vector3, col: Color) -> void:
+	var s := _surf(surface)
+	var wa := xform * a
+	var wb := xform * b
+	var wc := xform * c
+	if (wb - wa).cross(wc - wa).length_squared() < 1e-14:
+		return
+	var bas := xform.basis
+	var ma := (bas * na).normalized()
+	var mb := (bas * nb).normalized()
+	var mc := (bas * nc).normalized()
+	s["v"].append(wa); s["v"].append(wc); s["v"].append(wb)
+	s["n"].append(ma); s["n"].append(mc); s["n"].append(mb)
+	s["s"].append(ma); s["s"].append(mc); s["s"].append(mb)
+	for i in 3:
+		s["c"].append(col)
+
+
 func quad(surface: String, a: Vector3, b: Vector3, c: Vector3, d: Vector3, col: Color) -> void:
 	tri(surface, a, b, c, col)
 	tri(surface, a, c, d, col)

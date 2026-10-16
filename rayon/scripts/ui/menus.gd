@@ -372,7 +372,7 @@ func show_garage() -> void:
 			show_garage())
 		paints.add_child(sw)
 	# Rims (the imported models keep their own wheels).
-	if ImportedCar.is_imported(kind):
+	if StylizedCar.PRESETS.has(kind):
 		_box.add_child(_text("Диски: заводские", 20, Color.WHITE))
 	else:
 		_rims_row(kind, setup)

@@ -10,6 +10,7 @@ func _initialize() -> void:
 	var out := {}
 	for kind in ["sado", "chabuk", "posbon"]:
 		out["cars/" + kind] = CarBuilder.build(kind)
+	# m5 / cls come from the Blender GLBs (tools/blender/build_cars.py), see BlenderCar.
 	for style in ["sport", "steel"]:
 		var mi := MeshInstance3D.new()
 		mi.name = "Wheel_" + style

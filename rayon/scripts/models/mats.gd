@@ -98,6 +98,54 @@ static func marker(color: Color) -> StandardMaterial3D:
 	return m
 
 
+## Soft, glossy look for the FR-Legends-style cars (smooth shading, shiny paint).
+static func car_paint(color: Color, outline_thickness := 0.012) -> StandardMaterial3D:
+	var m := StandardMaterial3D.new()
+	m.vertex_color_use_as_albedo = true
+	m.vertex_color_is_srgb = true
+	m.albedo_color = color
+	m.diffuse_mode = BaseMaterial3D.DIFFUSE_LAMBERT_WRAP
+	m.specular_mode = BaseMaterial3D.SPECULAR_SCHLICK_GGX
+	m.roughness = 0.28
+	m.metallic_specular = 0.7
+	m.rim_enabled = true
+	m.rim = 0.25
+	m.rim_tint = 0.6
+	if outline_thickness > 0.0:
+		m.next_pass = outline(outline_thickness)
+	return m
+
+
+static func for_car(paint_color: Color, outline_thickness := 0.012) -> Dictionary:
+	var key := "car_%.3f" % outline_thickness
+	if not _cache.has(key):
+		var base_m := StandardMaterial3D.new()
+		base_m.vertex_color_use_as_albedo = true
+		base_m.vertex_color_is_srgb = true
+		base_m.diffuse_mode = BaseMaterial3D.DIFFUSE_LAMBERT_WRAP
+		base_m.roughness = 0.6
+		if outline_thickness > 0.0:
+			base_m.next_pass = outline(outline_thickness)
+		var detail_m := base_m.duplicate()
+		detail_m.next_pass = null
+		var glass_m := StandardMaterial3D.new()
+		glass_m.vertex_color_use_as_albedo = true
+		glass_m.vertex_color_is_srgb = true
+		glass_m.roughness = 0.12
+		glass_m.metallic_specular = 0.9
+		glass_m.rim_enabled = true
+		glass_m.rim = 0.4
+		var lamp_m := detail_m.duplicate()
+		lamp_m.emission_enabled = true
+		lamp_m.emission = Color(1, 1, 1)
+		lamp_m.emission_energy_multiplier = 0.35
+		lamp_m.emission_operator = BaseMaterial3D.EMISSION_OP_MULTIPLY
+		_cache[key] = {"base": base_m, "detail": detail_m, "glass": glass_m, "lamp": lamp_m}
+	var d: Dictionary = _cache[key].duplicate()
+	d["paint"] = car_paint(paint_color, outline_thickness)
+	return d
+
+
 ## Standard surface → material map for a model.
 static func for_model(outline_thickness := 0.025, paint_color := Color.WHITE) -> Dictionary:
 	return {

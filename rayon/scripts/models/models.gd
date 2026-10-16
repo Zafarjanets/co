@@ -33,6 +33,10 @@ static func _build(path: String) -> Node3D:
 				var n := Node3D.new()
 				n.add_child(mi)
 				return n
+			if BlenderCar.available(name):
+				return BlenderCar.build(name)
+			if StylizedCar.PRESETS.has(name):
+				return StylizedCar.build(name)
 			return CarBuilder.build(name)
 		"people":
 			return PersonBuilder.build(name)

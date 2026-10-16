@@ -314,11 +314,28 @@ func show_garage() -> void:
 	var cars := HBoxContainer.new()
 	cars.add_theme_constant_override("separation", 10)
 	_box.add_child(cars)
+	var grid := GridContainer.new()
+	grid.columns = 2
+	grid.add_theme_constant_override("h_separation", 10)
+	grid.add_theme_constant_override("v_separation", 8)
+	cars.add_child(grid)
+	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	for k in Game.CIVIL_CARS:
-		var desc := "SADO — седан, задний привод" if k == "sado" else "CHABUK — хэтчбек, передний привод"
-		var b := _button(("✔ " if k == kind else "") + desc, func():
+		var info: Dictionary = Game.CAR_INFO[k]
+		var text := "%s — %s" % [info["title"], info["desc"]]
+		if k == kind:
+			text = "✔ " + text
+		elif not Game.owns(k):
+			text = "Купить %s — $%d" % [info["title"], info["price"]]
+		var b := _button(text, func():
+			if not Game.owns(k):
+				if not Game.buy_car(k):
+					_no_money()
+					return
+				Sfx.ui_ok()
+				main.hud.toast("Куплена машина %s!" % info["title"], 2.0)
 			Game.select_car(k)
-			show_garage(), cars)
+			show_garage(), grid)
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	# Stats.
 	var spec: Dictionary = Car.SPECS[kind]
@@ -354,7 +371,17 @@ func show_garage() -> void:
 				_no_money()
 			show_garage())
 		paints.add_child(sw)
-	# Rims.
+	# Rims (the imported models keep their own wheels).
+	if ImportedCar.is_imported(kind):
+		_box.add_child(_text("Диски: заводские", 20, Color.WHITE))
+	else:
+		_rims_row(kind, setup)
+	_upgrade_row(kind, "engine", "Двигатель", Game.PRICE_ENGINE, "+14% мощности, +4% скорости")
+	_upgrade_row(kind, "grip", "Сцепление шин", Game.PRICE_GRIP, "+8% сцепления")
+	_garage_footer()
+
+
+func _rims_row(kind: String, setup: Dictionary) -> void:
 	_box.add_child(_text("Диски — $%d" % Game.PRICE_RIMS, 20, Color.WHITE))
 	var rims := HBoxContainer.new()
 	rims.add_theme_constant_override("separation", 10)
@@ -371,9 +398,9 @@ func show_garage() -> void:
 				_no_money()
 			show_garage(), rims)
 		b2.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	# Upgrades.
-	_upgrade_row(kind, "engine", "Двигатель", Game.PRICE_ENGINE, "+14% мощности, +4% скорости")
-	_upgrade_row(kind, "grip", "Сцепление шин", Game.PRICE_GRIP, "+8% сцепления")
+
+
+func _garage_footer() -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 10)
 	_box.add_child(row)

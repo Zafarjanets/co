@@ -19,6 +19,13 @@ const SPECS := {
 	"posbon": {"mass": 1550.0, "engine": 12500.0, "max_speed": 54.0, "drive": "rwd", "grip_f": 1.45, "grip_r": 1.42,
 		"hb_grip": 0.5, "steer": 0.56, "spring": 46000.0, "damper": 3600.0, "brake": 15000.0, "anti_roll": 14000.0,
 		"slide_keep": 0.88, "power_slide": 0.15, "drift_limit": 0.5},
+	# Imported models (models/imported/*.glb): big, powerful rear-drive sedans.
+	"m5": {"mass": 1850.0, "engine": 15500.0, "max_speed": 62.0, "drive": "rwd", "grip_f": 1.48, "grip_r": 1.38,
+		"hb_grip": 0.38, "steer": 0.55, "spring": 54000.0, "damper": 4300.0, "brake": 19000.0, "anti_roll": 17000.0,
+		"slide_keep": 0.8, "power_slide": 0.45, "drift_limit": 0.7},
+	"cls": {"mass": 1800.0, "engine": 13000.0, "max_speed": 58.0, "drive": "rwd", "grip_f": 1.45, "grip_r": 1.40,
+		"hb_grip": 0.42, "steer": 0.55, "spring": 50000.0, "damper": 4000.0, "brake": 18000.0, "anti_roll": 16000.0,
+		"slide_keep": 0.84, "power_slide": 0.3, "drift_limit": 0.6},
 }
 
 const SUSP_UP := 0.30          # ray origin above the wheel centre at rest (model pose)
@@ -85,7 +92,7 @@ static func create(car_kind: String, cfg := {}) -> Car:
 
 
 func _setup(cfg: Dictionary) -> void:
-	model = Models.instance("cars/" + kind)
+	model = ImportedCar.build(kind) if ImportedCar.is_imported(kind) else Models.instance("cars/" + kind)
 	model.name = "Model"
 	add_child(model)
 	radius = model.get_meta("radius", 0.3)
@@ -153,8 +160,18 @@ func apply_config(cfg: Dictionary) -> void:
 		var body: MeshInstance3D = model.get_node("Body")
 		var idx := (body.mesh as ArrayMesh).surface_find_by_name("paint")
 		if idx >= 0:
-			body.set_surface_override_material(idx, Mats.paint(paint, 0.022))
-	if cfg.has("rims") and cfg["rims"] != rims:
+			if model.has_meta("imported"):
+				# Keep the model's own material, only change its colour.
+				var m := (body.mesh as ArrayMesh).surface_get_material(idx)
+				if m is BaseMaterial3D:
+					var copy := (m as BaseMaterial3D).duplicate() as BaseMaterial3D
+					copy.albedo_color = paint
+					body.set_surface_override_material(idx, copy)
+			else:
+				body.set_surface_override_material(idx, Mats.paint(paint, 0.022))
+	if model.has_meta("imported"):
+		pass  # imported cars keep their own wheels
+	elif cfg.has("rims") and cfg["rims"] != rims:
 		rims = cfg["rims"]
 		var mesh := CarBuilder.wheel_mesh(rims, radius, model.get_meta("tyre_w", 0.2))
 		for s in spin_nodes:

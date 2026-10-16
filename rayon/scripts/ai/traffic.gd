@@ -96,7 +96,8 @@ func _try_spawn(focus: Vector3) -> void:
 		if not clear:
 			continue
 		var dir: Vector3 = (pts[1] - pts[0]).normalized()
-		var kind := "sado" if _rng.randf() < 0.5 else "chabuk"
+		var roll := _rng.randf()
+		var kind := "sado" if roll < 0.42 else ("chabuk" if roll < 0.84 else ("m5" if roll < 0.92 else "cls"))
 		var cfg := {"paint": Game.PAINTS[_rng.randi() % Game.PAINTS.size()][1], "rims": "steel" if _rng.randf() < 0.65 else "sport"}
 		var car := main.spawn_car(kind, Transform3D(Basis(Vector3.UP, atan2(-dir.x, -dir.z)), p + Vector3(0, 0.5, 0)), cfg)
 		car.linear_velocity = dir * 8.0

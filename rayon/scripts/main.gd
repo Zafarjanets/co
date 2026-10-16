@@ -54,6 +54,7 @@ func _ready() -> void:
 
 	_spawn_my_car()
 	_spawn_parked_cars()
+	_spawn_showcase_cars()
 
 	traffic = Traffic.new()
 	world.add_child(traffic)
@@ -129,6 +130,17 @@ func _spawn_parked_cars() -> void:
 		c.set_meta("parked", true)
 		c.sleeping = true
 		n += 1
+
+
+## The two imported models stand next to the garage so they can be tried at once.
+func _spawn_showcase_cars() -> void:
+	for spot in [["m5", Vector3(-81.0, 0.7, 21.0)], ["cls", Vector3(-107.0, 0.7, 34.0)]]:
+		var kind: String = spot[0]
+		if kind == Game.selected_car():
+			continue
+		var c := spawn_car(kind, Transform3D(Basis.IDENTITY, spot[1]), {})
+		c.set_meta("parked", true)
+		c.set_meta("showcase", true)
 
 
 func _on_car_config_changed(kind: String) -> void:
@@ -456,27 +468,55 @@ func apply_settings() -> void:
 			sun.shadow_enabled = false
 			vp.scaling_3d_scale = 0.75
 			vp.msaa_3d = Viewport.MSAA_DISABLED
-			RenderingServer.global_shader_parameter_set("outline_scale", 0.0)
+			_set_outline_scale(0.0)
 			rig.camera.far = 900.0
 		1:
 			sun.shadow_enabled = true
 			sun.directional_shadow_max_distance = 90.0
 			vp.scaling_3d_scale = 1.0
 			vp.msaa_3d = Viewport.MSAA_DISABLED
-			RenderingServer.global_shader_parameter_set("outline_scale", 1.0)
+			_set_outline_scale(1.0)
 			rig.camera.far = 2500.0
 		_:
 			sun.shadow_enabled = true
 			sun.directional_shadow_max_distance = 140.0
 			vp.scaling_3d_scale = 1.0
 			vp.msaa_3d = Viewport.MSAA_2X
-			RenderingServer.global_shader_parameter_set("outline_scale", 1.0)
+			_set_outline_scale(1.0)
 			rig.camera.far = 4000.0
 	Sfx.set_volume(Game.setting("volume"))
 	if traffic:
 		traffic.set_quality(q)
 	if peds:
 		peds.set_quality(q)
+
+
+## Low quality hides the dark outlines (one shared parameter per outline material).
+func _set_outline_scale(v: float) -> void:
+	var seen := {}
+	var stack: Array[Node] = [get_tree().root]
+	while not stack.is_empty():
+		var n: Node = stack.pop_back()
+		stack.append_array(n.get_children())
+		var meshes: Array = []
+		if n is MeshInstance3D and n.mesh:
+			meshes.append(n.mesh)
+			for i in n.get_surface_override_material_count():
+				_outline_param(n.get_surface_override_material(i), v, seen)
+		elif n is MultiMeshInstance3D and n.multimesh and n.multimesh.mesh:
+			meshes.append(n.multimesh.mesh)
+		for m in meshes:
+			for i in (m as Mesh).get_surface_count():
+				_outline_param((m as Mesh).surface_get_material(i), v, seen)
+	Mats.outline_scale = v
+
+
+func _outline_param(mat: Material, v: float, seen: Dictionary) -> void:
+	while mat != null and not seen.has(mat):
+		seen[mat] = true
+		if mat is ShaderMaterial and (mat as ShaderMaterial).shader == Mats.OUTLINE_SHADER:
+			(mat as ShaderMaterial).set_shader_parameter("outline_scale", v)
+		mat = mat.next_pass
 
 
 func start_game() -> void:

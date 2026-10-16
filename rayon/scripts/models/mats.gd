@@ -13,6 +13,7 @@ extends RefCounted
 const OUTLINE_SHADER := preload("res://shaders/outline.gdshader")
 
 static var _cache := {}
+static var outline_scale := 1.0      # set by the quality setting
 
 
 static func outline(thickness: float) -> ShaderMaterial:
@@ -22,6 +23,7 @@ static func outline(thickness: float) -> ShaderMaterial:
 	var m := ShaderMaterial.new()
 	m.shader = OUTLINE_SHADER
 	m.set_shader_parameter("thickness", thickness)
+	m.set_shader_parameter("outline_scale", outline_scale)
 	_cache[key] = m
 	return m
 

@@ -41,10 +41,3 @@ lights_and_shadows/directional_shadow/size=4096
 lights_and_shadows/directional_shadow/soft_shadow_filter_quality=2
 textures/default_filters/anisotropic_filtering_level=0
 environment/defaults/default_clear_color=Color(0.53, 0.78, 0.96, 1)
-
-[shader_globals]
-
-outline_scale={
-"type": "float",
-"value": 1.0
-}
